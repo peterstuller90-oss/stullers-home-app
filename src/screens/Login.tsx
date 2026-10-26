@@ -1,8 +1,9 @@
 import { Logo } from '../components/Logo'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { Avatar } from '../components/Avatar'
 import { FAMILY, type Member } from '../lib/family'
+import { biometricName, isCancel, login, loginOptions, passkeysSupported, savedPasskey, type LoginOptions } from '../lib/passkey'
 
 const PIN_LENGTH = 6
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫']
@@ -12,6 +13,26 @@ export function Login({ supabase }: { supabase: SupabaseClient }) {
   const [pin, setPin] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [faceId, setFaceId] = useState<LoginOptions | null>(null)
+
+  // If this device has Face ID set up for the chosen profile, get the login challenge ready before the tap.
+  const hasFaceId = !!member && passkeysSupported() && !!savedPasskey(member.email)
+  useEffect(() => {
+    if (member && hasFaceId && !faceId) loginOptions(supabase, member.email).then(setFaceId).catch(() => {})
+  }, [supabase, member, hasFaceId, faceId])
+
+  async function useFaceId() {
+    if (busy || !member) return
+    setBusy(true)
+    setError('')
+    try {
+      await login(supabase, faceId ?? await loginOptions(supabase, member.email))
+    } catch (e) {
+      if (!isCancel(e)) setError(e instanceof Error ? e.message : 'Nepodarilo sa to.')
+    }
+    setFaceId(null)
+    setBusy(false)
+  }
 
   async function press(key: string) {
     if (busy || !member) return
@@ -64,7 +85,10 @@ export function Login({ supabase }: { supabase: SupabaseClient }) {
             ? <button key={i} className="key" onClick={() => press(k)} aria-label={k === '⌫' ? 'Zmazať' : k}>{k}</button>
             : <span key={i} />)}
         </div>
-        <button className="link-btn" onClick={() => { setMember(null); setPin(''); setError('') }}>← Iný profil</button>
+        {hasFaceId && (
+          <button className="btn-primary faceid-btn" onClick={useFaceId} disabled={busy}>🙂 Prihlásiť cez {biometricName()}</button>
+        )}
+        <button className="link-btn" onClick={() => { setMember(null); setPin(''); setError(''); setFaceId(null) }}>← Iný profil</button>
       </div>
     </main>
   )

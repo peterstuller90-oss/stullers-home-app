@@ -176,6 +176,7 @@ h1, h2, h3, p { margin: 0; }
 .shake { animation: shake 0.35s; }
 .keypad { display: grid; grid-template-columns: repeat(3, 76px); gap: 14px; }
 .key { width: 76px; height: 76px; border-radius: 50%; border: none; background: var(--card); border: var(--border); box-shadow: var(--shadow); font-size: 32px; font-weight: 500; color: var(--ink); transition: transform 0.12s; }
+.faceid-btn { width: 100%; max-width: 320px; margin-top: 6px; }
 .link-btn { border: none; background: none; color: var(--ink); font-weight: 500; font-size: 18px; padding: 12px; text-decoration: underline; text-transform: uppercase; }
 @keyframes shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
 .error { color: var(--accent-dark); font-size: 17px; font-weight: 500; }
