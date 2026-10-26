@@ -352,3 +352,9 @@ html { font-synthesis: none; }
 .path-step.current .path-label { opacity: 1; font-size: 16px; }
 .path-here { background: var(--ink); color: #fff; font-size: 14px; text-transform: uppercase; padding: 4px 12px; border-radius: 12px; position: relative; white-space: nowrap; animation: bob 2s ease-in-out infinite; }
 .path-here::after { content: ""; position: absolute; left: 50%; bottom: -6px; margin-left: -6px; border: 6px solid transparent; border-bottom: 0; border-top-color: var(--ink); }
+
+/* Notifications */
+.push-card { padding: 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px; }
+.push-row { display: flex; gap: 12px; align-items: flex-start; text-align: left; }
+.push-row .task-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.push-icon { font-size: 30px; line-height: 1; }

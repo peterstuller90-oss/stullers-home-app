@@ -5,6 +5,7 @@ import { Icon } from '../components/Icon'
 import { LevelBar } from '../components/LevelBar'
 import { StreakChip } from '../components/StreakChip'
 import { Badges } from '../components/Badges'
+import { PushToggle } from '../components/PushToggle'
 import type { PlayerStats } from '../lib/gamification'
 import { uploadAvatar } from '../lib/data'
 import type { CurrentUser } from '../lib/user'
@@ -51,6 +52,8 @@ export function Profile({ user, stats, supabase, onChanged, onSignOut }: Props) 
         <StreakChip days={stats.streak} />
         <LevelBar xp={user.xp} />
       </section>
+
+      <PushToggle supabase={supabase} />
 
       <Badges stats={stats} />
 
