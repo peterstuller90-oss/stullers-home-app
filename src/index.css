@@ -234,8 +234,8 @@ code { background: var(--bg); padding: 1px 6px; border-radius: 6px; font-size: 1
 .avatar-badge { position: absolute; right: -2px; bottom: -2px; width: 34px; height: 34px; border-radius: 50%; background: var(--card); border: var(--border); display: grid; place-items: center; font-size: 17px; }
 
 /* Sheets */
-.sheet-backdrop { position: fixed; inset: 0; z-index: 10; background: rgba(91, 75, 122, 0.55); display: flex; align-items: flex-end; justify-content: center; animation: fade-in 0.2s ease; }
-.sheet { width: 100%; max-width: 520px; margin: 12px; padding: 24px 20px calc(env(safe-area-inset-bottom) + 12px); display: flex; flex-direction: column; gap: 8px; text-align: center; }
+.sheet-backdrop { position: fixed; inset: 0; z-index: 60; background: rgba(91, 75, 122, 0.55); display: flex; align-items: flex-end; justify-content: center; animation: fade-in 0.2s ease; }
+.sheet { width: 100%; max-width: 520px; margin: 12px; max-height: calc(100dvh - env(safe-area-inset-top) - 24px); overflow-y: auto; box-sizing: border-box; padding: 24px 20px calc(env(safe-area-inset-bottom) + 12px); display: flex; flex-direction: column; gap: 8px; text-align: center; }
 .sheet h3 { font-size: 22px; }
 .sheet-members { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
 .sheet-member { border: var(--border); background: var(--card); border-radius: 18px; padding: 14px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px; font-weight: 500; transition: transform 0.15s; }

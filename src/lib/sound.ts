@@ -23,10 +23,22 @@ function audio(): AudioContext | null {
   return ctx
 }
 
-// Called once from main.tsx: the first touch anywhere wakes the audio up.
+// Called once from main.tsx. iPhone starts web audio only inside a real tap (touchend/click, not
+// pointerdown) and only after something has played, so every tap until then plays a silent sample.
 export function unlockAudioOnFirstTap() {
-  const unlock = () => { audio(); window.removeEventListener('pointerdown', unlock) }
-  window.addEventListener('pointerdown', unlock)
+  const events = ['touchend', 'click', 'keydown'] as const
+  const unlock = () => {
+    const a = audio()
+    if (!a) return
+    const src = a.createBufferSource()
+    src.buffer = a.createBuffer(1, 1, 22050)
+    src.connect(a.destination)
+    src.start(0)
+    a.resume().then(() => {
+      if (a.state === 'running') events.forEach((e) => window.removeEventListener(e, unlock, true))
+    }).catch(() => {})
+  }
+  events.forEach((e) => window.addEventListener(e, unlock, true))
 }
 
 // One bell-like note: quick attack, soft exponential fade, a quiet octave on top for sparkle.
