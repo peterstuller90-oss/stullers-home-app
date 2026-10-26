@@ -47,6 +47,18 @@ export default function App() {
     reload()
   }, [reload])
 
+  // A home-screen app on iPhone is resumed, not reopened, so refresh when it comes back
+  // to the front and every 30 s while open: changes from other phones show up on their own.
+  useEffect(() => {
+    const refresh = () => { if (document.visibilityState === 'visible') reload() }
+    document.addEventListener('visibilitychange', refresh)
+    const timer = setInterval(refresh, 30_000)
+    return () => {
+      document.removeEventListener('visibilitychange', refresh)
+      clearInterval(timer)
+    }
+  }, [reload])
+
   const user = data?.profiles.find((p) => p.id === userId)
   const stats = useMemo(() => (user && data ? statsFor(user.id, user.xp, data.completions) : null), [user, data])
   const weekly = useMemo(() => weeklyXp(data?.xpLog ?? []), [data])

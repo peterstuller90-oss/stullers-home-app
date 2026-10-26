@@ -19,13 +19,19 @@ Rodinná webová aplikácia (React + TypeScript + Vite). Stránka beží na dom�
 
 Funguje iba keď je počítač zapnutý, aplikácia spustená a zariadenie je doma na Wi-Fi.
 
-## Testovacia verzia na GitHub Pages
+## Appka na iPhone (GitHub Pages)
 
-Testovacia verzia beží na `https://peterstuller90-oss.github.io/stullers-home-app/`.
-Zostaví sa s cestou podstránky a nahrá do vetvy `gh-pages`:
+Appka beží na `https://peterstuller90-oss.github.io/stullers-home-app/`.
+
+Pridanie na plochu: otvor odkaz v **Safari** → tlačidlo **Zdieľať** (štvorček so šípkou) → **Pridať na plochu** → **Pridať**.
+Appka sa potom otvára na celú obrazovku s vlastnou ikonou. Prihlásenie PINom treba v appke urobiť raz, potom si ho pamätá.
+Úlohy a body sú v Supabase, takže každý mobil vidí to isté. Appka sa obnoví sama, keď ju otvoríš, a každých 30 sekúnd.
+
+Po každom zlúčení zmeny do vetvy `main` sa appka sama zostaví a nahrá (GitHub Actions, súbor `.github/workflows/deploy.yml`, do vetvy `gh-pages`).
+Ručne sa dá zostaviť takto:
 
 ```
 BASE_PATH=/stullers-home-app/ npm run build
 ```
 
-Obsah priečinka `dist` patrí do vetvy `gh-pages`. Verejný (publishable) kľúč Supabase je v zostavenej stránke viditeľný, to je v poriadku: dáta chránia pravidlá RLS v databáze. Service role kľúč nikdy nepatrí do aplikácie ani do repozitára.
+Verejný (publishable) kľúč Supabase je v zostavenej stránke viditeľný, to je v poriadku: dáta chránia pravidlá RLS v databáze. Service role kľúč nikdy nepatrí do aplikácie ani do repozitára. PINy nepatria do kódu ani do repozitára.
