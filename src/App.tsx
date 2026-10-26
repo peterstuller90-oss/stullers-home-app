@@ -1,3 +1,6 @@
+import { Settings } from './screens/Settings'
+import { Icon } from './components/Icon'
+import { play } from './lib/sound'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
@@ -18,6 +21,7 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<Tab>('home')
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [data, setData] = useState<FamilyData | null>(null)
   const [loadError, setLoadError] = useState('')
 
@@ -89,7 +93,13 @@ export default function App() {
 
   return (
     <div className="app">
-      <main className="content" key={tab}>
+      <main className="content" key={settingsOpen ? 'settings' : tab}>
+        {settingsOpen ? (
+          <Settings supabase={supabase} onBack={() => setSettingsOpen(false)} onSignOut={() => { setSettingsOpen(false); supabase!.auth.signOut() }} />
+        ) : <>
+        <button className="settings-btn" onClick={() => { play('tap'); setSettingsOpen(true) }} aria-label="Nastavenia">
+          <Icon name="settings" size={26} />
+        </button>
         {tab === 'home' && <Home user={user} tasks={data.myTasks} streak={stats.streak} onNavigate={setTab} />}
         {tab === 'tasks' && (
           <Tasks tasks={data.myTasks} assigneesByTask={data.assigneesByTask} user={user} profiles={data.profiles} supabase={supabase} onChanged={reload} />
@@ -100,10 +110,11 @@ export default function App() {
         )}
         {tab === 'family' && <Family profiles={data.profiles} currentId={user.id} weekly={weekly} />}
         {tab === 'profile' && (
-          <Profile user={user} stats={stats} supabase={supabase} onChanged={reload} onSignOut={() => supabase!.auth.signOut()} />
+          <Profile user={user} stats={stats} supabase={supabase} onChanged={reload} />
         )}
+        </>}
       </main>
-      <TabBar active={tab} onChange={setTab} isParent={user.role === 'parent'}
+      <TabBar active={tab} onChange={(t) => { setSettingsOpen(false); setTab(t) }} isParent={user.role === 'parent'}
         parentBadge={data.approvals.filter((a) => a.userId !== user.id).length} />
       {current && <Celebration event={current} onDone={next} />}
     </div>

@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { Avatar } from '../components/Avatar'
 import { AssignSheet } from '../components/AssignSheet'
 import { TaskIcon } from '../components/TaskIcon'
+import { CustomTaskSheet } from '../components/CustomTaskSheet'
 import type { Approval, ProfileStats, TaskDef } from '../lib/data'
 import type { CurrentUser } from '../lib/user'
 
@@ -21,6 +22,7 @@ export function Parent({ user, profiles, tasks, approvals, assigneesByTask, supa
   const [view, setView] = useState<'approvals' | 'assign'>('approvals')
   const [assigning, setAssigning] = useState<TaskDef | null>(null)
   const [busyId, setBusyId] = useState('')
+  const [customOpen, setCustomOpen] = useState(false)
   const [error, setError] = useState('')
   const member = (id: string) => profiles.find((p) => p.id === id)
 
@@ -82,6 +84,10 @@ export function Parent({ user, profiles, tasks, approvals, assigneesByTask, supa
       ))}
 
       {view === 'assign' && (
+        <button className="btn-primary custom-task-btn" onClick={() => setCustomOpen(true)}>＋ Vlastná úloha</button>
+      )}
+
+      {view === 'assign' && (
         <ul className="card task-list">
           {tasks.map((t) => {
             const who = (assigneesByTask.get(t.id) ?? []).map((id) => member(id)?.name).filter(Boolean)
@@ -100,6 +106,11 @@ export function Parent({ user, profiles, tasks, approvals, assigneesByTask, supa
             )
           })}
         </ul>
+      )}
+
+      {customOpen && (
+        <CustomTaskSheet members={profiles} supabase={supabase}
+          onClose={(changed) => { setCustomOpen(false); if (changed) onChanged() }} />
       )}
 
       {assigning && (

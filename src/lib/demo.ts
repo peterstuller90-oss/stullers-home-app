@@ -34,7 +34,9 @@ const TASKS = [
   [24, 'Povysávať celé auto', 10],
   [25, 'Upratať bicykle', 5],
   [26, 'Pozrieť prababku', 5],
-].map(([code, name, xp]) => ({ id: 't' + code, code: code as number, name: name as string, xp: xp as number }))
+].map(([code, name, xp]) => ({ id: 't' + code, code: code as number | null, name: name as string, xp: xp as number }))
+// The 26 standing tasks plus one-off custom tasks created in the demo.
+const ALL_TASKS = [...TASKS]
 
 type Status = 'available' | 'waiting_for_approval' | 'completed' | 'rejected'
 interface Row { id: string; task_id: string; user_id: string; status: Status; created_at: string; submitted_at: string | null; reviewed_at: string | null }
@@ -55,7 +57,7 @@ const rows: Row[] = ([
   reviewed_at: status === 'completed' ? hoursAgo(daysAgo * 24 + 1) : null,
 }))
 const xp: { user_id: string; xp: number; created_at: string }[] = rows.filter((r) => r.status === 'completed')
-  .map((r) => ({ user_id: r.user_id, xp: TASKS.find((t) => t.id === r.task_id)!.xp, created_at: r.reviewed_at! }))
+  .map((r) => ({ user_id: r.user_id, xp: ALL_TASKS.find((t) => t.id === r.task_id)!.xp, created_at: r.reviewed_at! }))
 
 let me: string | null = null
 const isParent = () => USERS.some(([id, , role]) => id === me && role === 'parent')
@@ -79,7 +81,7 @@ function rpc(name: string, a: Record<string, unknown>) {
       if (row.user_id === me) return fail('Vlastnú úlohu nemôžeš schváliť.')
       row.status = a.p_approve ? 'completed' : 'rejected'
       row.reviewed_at = new Date().toISOString()
-      if (a.p_approve) xp.push({ user_id: row.user_id, xp: TASKS.find((t) => t.id === row.task_id)!.xp, created_at: row.reviewed_at })
+      if (a.p_approve) xp.push({ user_id: row.user_id, xp: ALL_TASKS.find((t) => t.id === row.task_id)!.xp, created_at: row.reviewed_at })
       return json(null, 204)
     case 'reassign_assignment': {
       if (!row || row.status === 'completed') return fail('Túto úlohu nie je možné preradiť.')
@@ -88,6 +90,17 @@ function rpc(name: string, a: Record<string, unknown>) {
       if (!(isParent() || (row.user_id === me && ['available', 'rejected'].includes(row.status))))
         return fail('Túto úlohu môžeš preradiť iba ak je tvoja a ešte nie je odoslaná.')
       Object.assign(row, { user_id: a.p_new_user, status: 'available', submitted_at: null, reviewed_at: null }); return json(null, 204)
+    }
+    case 'create_custom_task': {
+      if (!isParent()) return fail('Vlastnú úlohu môže zadať iba rodič.')
+      const name = String(a.p_name ?? '').trim()
+      if (name.length < 2 || name.length > 80) return fail('Názov úlohy musí mať 2 až 80 znakov.')
+      if (!(Number(a.p_xp) >= 1 && Number(a.p_xp) <= 100)) return fail('XP musí byť od 1 do 100.')
+      const id = 'c' + ++seq
+      ALL_TASKS.push({ id, code: null, name, xp: Number(a.p_xp) })
+      for (const u of a.p_users as string[])
+        rows.unshift({ id: 'a' + ++seq, task_id: id, user_id: u, status: 'available', created_at: new Date().toISOString(), submitted_at: null, reviewed_at: null })
+      return json(id)
     }
     case 'assign_task': {
       if (!isParent()) return fail('Prideľovať môže iba rodič.')
@@ -123,7 +136,7 @@ export const demoFetch: typeof fetch = async (input, init) => {
     completed_count: rows.filter((r) => r.user_id === id && r.status === 'completed').length,
   })))
   if (p.endsWith('/assignments')) return json([...rows].sort((a, b) => b.created_at.localeCompare(a.created_at)).map((r) => {
-    const t = TASKS.find((x) => x.id === r.task_id)!
+    const t = ALL_TASKS.find((x) => x.id === r.task_id)!
     return { ...r, tasks: { name: t.name, xp: t.xp, code: t.code } }
   }))
   if (p.endsWith('/tasks')) return json(TASKS)

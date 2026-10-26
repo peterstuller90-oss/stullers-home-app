@@ -19,11 +19,15 @@ export function Home({ user, tasks, streak, onNavigate }: Props) {
   return (
     <>
       <Logo width={170} />
-      <section className="card hero">
-        <Avatar name={user.name} url={user.avatarUrl} size={96} />
-        <h2>{user.name}</h2>
-        <p className="xp-big">{user.xp} XP</p>
-        <StreakChip days={streak} />
+      <section className="card hero-compact">
+        <div className="hero-row">
+          <Avatar name={user.name} url={user.avatarUrl} size={56} />
+          <div className="hero-who">
+            <h2>{user.name}</h2>
+            <StreakChip days={streak} />
+          </div>
+          <span className="hero-xp">{user.xp} XP</span>
+        </div>
         <LevelBar xp={user.xp} />
       </section>
 

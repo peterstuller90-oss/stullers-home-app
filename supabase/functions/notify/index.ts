@@ -44,20 +44,33 @@ Deno.serve(async (req) => {
   if (!task || !profiles) return Response.json({ sent: 0 })
   const nameOf = (id: string) => profiles.find((p) => p.id === id)?.name ?? 'Niekto'
 
-  // Who should hear about this change, and what they read.
+  // Who should hear about this change, and what they read. The person who made the change never gets
+  // a notification about it (filtered below); kids hear about their own tasks, parents about everything.
+  const who = nameOf(rec.user_id)
+  const by = actor ? nameOf(actor) : 'Niekto'
+  const parents = profiles.filter((p) => p.role === 'parent').map((p) => p.id)
+  const everyone = profiles.map((p) => p.id)
+  const except = (ids: string[], ...skip: string[]) => ids.filter((id) => !skip.includes(id))
+  const xp = `+${task.xp} XP`
+
   const out: { to: string[]; msg: Message }[] = []
   if (payload.type === 'INSERT') {
-    out.push({ to: [rec.user_id], msg: { title: 'Nová úloha 📋', body: `${task.name} (+${task.xp} XP)` } })
+    out.push({ to: [rec.user_id], msg: { title: 'Nová úloha 📋', body: `${task.name} (${xp}) · od ${by}` } })
+    out.push({ to: except(parents, rec.user_id), msg: { title: 'Pridelená úloha 📋', body: `${by} pridelil(a) ${who}: ${task.name}` } })
   } else if (old && old.user_id !== rec.user_id) {
-    out.push({ to: [rec.user_id], msg: { title: 'Úloha preradená na teba ⇄', body: `${task.name} od ${nameOf(old.user_id)}` } })
+    const from = nameOf(old.user_id)
+    out.push({ to: [rec.user_id], msg: { title: 'Úloha preradená na teba ⇄', body: `${task.name} od ${from}` } })
+    out.push({ to: [old.user_id], msg: { title: 'Úloha presunutá ⇄', body: `${task.name} teraz robí ${who}` } })
+    out.push({ to: except(parents, rec.user_id, old.user_id), msg: { title: 'Úloha preradená ⇄', body: `${task.name}: ${from} → ${who}` } })
   } else if (old && old.status !== rec.status) {
     if (rec.status === 'waiting_for_approval') {
-      const parents = profiles.filter((p) => p.role === 'parent' && p.id !== rec.user_id).map((p) => p.id)
-      out.push({ to: parents, msg: { title: `${nameOf(rec.user_id)} splnil(a) úlohu ✋`, body: `${task.name} čaká na schválenie` } })
+      out.push({ to: except(parents, rec.user_id), msg: { title: `${who} splnil(a) úlohu ✋`, body: `${task.name} čaká na schválenie` } })
     } else if (rec.status === 'completed') {
-      out.push({ to: [rec.user_id], msg: { title: `Schválené! +${task.xp} XP 🎉`, body: task.name } })
+      out.push({ to: [rec.user_id], msg: { title: `Schválené! ${xp} 🎉`, body: `${task.name} · schválil(a) ${by}` } })
+      out.push({ to: except(everyone, rec.user_id), msg: { title: `🎉 ${who} získal(a) ${xp}`, body: `${task.name} · schválil(a) ${by}` } })
     } else if (rec.status === 'rejected') {
       out.push({ to: [rec.user_id], msg: { title: 'Úloha vrátená ↩', body: `${task.name}: skús to ešte raz` } })
+      out.push({ to: except(parents, rec.user_id), msg: { title: 'Úloha vrátená ↩', body: `${by} vrátil(a) ${who}: ${task.name}` } })
     }
   }
 
