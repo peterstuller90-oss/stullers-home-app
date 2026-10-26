@@ -1,4 +1,5 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
+import { play } from '../lib/sound'
 import type { Badge } from '../lib/gamification'
 
 export type CelebrationEvent =
@@ -17,6 +18,8 @@ export function Celebration({ event, onDone }: { event: CelebrationEvent; onDone
     color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
     rotate: Math.random() * 360,
   })), [event])
+
+  useEffect(() => play(event.kind), [event])
 
   const [emoji, title, text] =
     event.kind === 'xp' ? ['⚡', `+${event.gained} XP`, 'Rodič schválil tvoju úlohu. Super práca!']

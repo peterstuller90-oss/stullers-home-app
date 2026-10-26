@@ -1,3 +1,4 @@
+import { play } from '../lib/sound'
 import { Logo } from '../components/Logo'
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -27,6 +28,7 @@ export function Login({ supabase }: { supabase: SupabaseClient }) {
     setError('')
     try {
       await login(supabase, faceId ?? await loginOptions(supabase, member.email))
+      play('correct')
     } catch (e) {
       if (!isCancel(e)) setError(e instanceof Error ? e.message : 'Nepodarilo sa to.')
     }
@@ -36,6 +38,7 @@ export function Login({ supabase }: { supabase: SupabaseClient }) {
 
   async function press(key: string) {
     if (busy || !member) return
+    play('tap')
     if (key === '⌫') return setPin(pin.slice(0, -1))
     if (!key || pin.length >= PIN_LENGTH) return
     const next = pin + key
@@ -45,6 +48,7 @@ export function Login({ supabase }: { supabase: SupabaseClient }) {
     setBusy(true)
     const { error } = await supabase.auth.signInWithPassword({ email: member.email, password: next })
     setBusy(false)
+    play(error ? 'wrong' : 'correct')
     if (error) {
       setError(error.status === 429 ? 'Veľa pokusov. Skús to o chvíľu.' : 'Nesprávny PIN.')
       setPin('')
@@ -59,7 +63,7 @@ export function Login({ supabase }: { supabase: SupabaseClient }) {
           <p className="muted">Kto si?</p>
           <div className="profile-grid">
             {FAMILY.map((m) => (
-              <button key={m.name} className="card profile-card" onClick={() => setMember(m)}>
+              <button key={m.name} className="card profile-card" onClick={() => { play('tap'); setMember(m) }}>
                 <Avatar name={m.name} size={84} />
                 <strong>{m.name}</strong>
               </button>

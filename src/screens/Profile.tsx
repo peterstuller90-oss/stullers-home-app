@@ -7,6 +7,7 @@ import { StreakChip } from '../components/StreakChip'
 import { Badges } from '../components/Badges'
 import { PushToggle } from '../components/PushToggle'
 import { FaceIdToggle } from '../components/FaceIdToggle'
+import { SoundToggle } from '../components/SoundToggle'
 import type { PlayerStats } from '../lib/gamification'
 import { uploadAvatar } from '../lib/data'
 import type { CurrentUser } from '../lib/user'
@@ -57,6 +58,8 @@ export function Profile({ user, stats, supabase, onChanged, onSignOut }: Props) 
       <FaceIdToggle supabase={supabase} />
 
       <PushToggle supabase={supabase} />
+
+      <SoundToggle />
 
       <Badges stats={stats} />
 

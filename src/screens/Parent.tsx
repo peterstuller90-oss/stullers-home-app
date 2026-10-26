@@ -1,3 +1,4 @@
+import { play } from '../lib/sound'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { Avatar } from '../components/Avatar'
@@ -29,7 +30,10 @@ export function Parent({ user, profiles, tasks, approvals, assigneesByTask, supa
     const { error } = await supabase.rpc('review_assignment', { p_assignment: a.id, p_approve: approve })
     setBusyId('')
     if (error) setError(error.message)
-    else onChanged()
+    else {
+      play(approve ? 'correct' : 'undo')
+      onChanged()
+    }
   }
 
   return (

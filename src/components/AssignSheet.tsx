@@ -1,3 +1,4 @@
+import { play } from '../lib/sound'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { Avatar } from './Avatar'
@@ -24,7 +25,10 @@ export function AssignSheet({ task, members, alreadyAssigned, supabase, onClose 
     const { error } = await supabase.rpc('assign_task', { p_task: task.id, p_users: picked })
     setBusy(false)
     if (error) setError(error.message)
-    else onClose(true)
+    else {
+      play('send')
+      onClose(true)
+    }
   }
 
   return (

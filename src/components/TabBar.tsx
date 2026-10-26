@@ -1,3 +1,4 @@
+import { play } from '../lib/sound'
 import { Icon, type IconName } from './Icon'
 
 export type Tab = 'home' | 'tasks' | 'family' | 'profile' | 'parent'
@@ -21,7 +22,7 @@ export function TabBar({ active, onChange, isParent, parentBadge }: Props) {
   return (
     <nav className="tabbar">
       {TABS.filter((t) => t.id !== 'parent' || isParent).map((t) => (
-        <button key={t.id} className={t.id === active ? 'tab active' : 'tab'} onClick={() => onChange(t.id)}>
+        <button key={t.id} className={t.id === active ? 'tab active' : 'tab'} onClick={() => { play('tap'); onChange(t.id) }}>
           <span className="tab-icon">
             <Icon name={t.icon} />
             {t.id === 'parent' && parentBadge > 0 && <span className="badge">{parentBadge}</span>}

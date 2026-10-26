@@ -1,3 +1,4 @@
+import { play } from '../lib/sound'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { TaskItem, type TaskItemData } from '../components/TaskItem'
@@ -38,6 +39,7 @@ export function Tasks({ tasks, assigneesByTask, user, profiles, supabase, onChan
     const { error } = await supabase.rpc('submit_assignment', { p_assignment: task.id })
     setBusy(false)
     if (error) return setError(error.message)
+    play('send')
     close()
     onChanged()
   }
