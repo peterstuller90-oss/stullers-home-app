@@ -1,3 +1,4 @@
+import { TaskIcon } from './TaskIcon'
 import { Sheet } from './Sheet'
 import { STATUS_LABEL, type TaskItemData } from './TaskItem'
 
@@ -16,6 +17,7 @@ export function TaskDetailSheet({ task, assignees, canReassign, busy, error, onD
   const canSubmit = task.status === 'available' || task.status === 'rejected'
   return (
     <Sheet onClose={onClose}>
+      <TaskIcon code={task.code} size={112} />
       <p className="detail-xp">+{task.xp} XP</p>
       <h3>{task.name}</h3>
       <span className={`status status-${task.status}`}>{STATUS_LABEL[task.status]}</span>

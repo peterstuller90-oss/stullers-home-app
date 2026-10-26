@@ -47,6 +47,22 @@ export default function App() {
     reload()
   }, [reload])
 
+  // Keep everyone's phone current: refresh when the app comes back to the screen, every 30 s while
+  // it is open, and right away when a notification arrives.
+  useEffect(() => {
+    const refresh = () => { if (document.visibilityState === 'visible') reload() }
+    const timer = setInterval(refresh, 30_000)
+    document.addEventListener('visibilitychange', refresh)
+    window.addEventListener('focus', refresh)
+    navigator.serviceWorker?.addEventListener('message', refresh)
+    return () => {
+      clearInterval(timer)
+      document.removeEventListener('visibilitychange', refresh)
+      window.removeEventListener('focus', refresh)
+      navigator.serviceWorker?.removeEventListener('message', refresh)
+    }
+  }, [reload])
+
   const user = data?.profiles.find((p) => p.id === userId)
   const stats = useMemo(() => (user && data ? statsFor(user.id, user.xp, data.completions) : null), [user, data])
   const weekly = useMemo(() => weeklyXp(data?.xpLog ?? []), [data])

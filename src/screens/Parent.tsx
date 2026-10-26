@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { Avatar } from '../components/Avatar'
 import { AssignSheet } from '../components/AssignSheet'
+import { TaskIcon } from '../components/TaskIcon'
 import type { Approval, ProfileStats, TaskDef } from '../lib/data'
 import type { CurrentUser } from '../lib/user'
 
@@ -83,6 +84,7 @@ export function Parent({ user, profiles, tasks, approvals, assigneesByTask, supa
             return (
               <li key={t.id}>
                 <button className="task" onClick={() => setAssigning(t)}>
+                  <TaskIcon code={t.code} />
                   <div className="task-main">
                     <span className="task-name">{t.name}</span>
                     <span className="status status-available">{who.length ? who.join(', ') : 'Nepridelené'}</span>

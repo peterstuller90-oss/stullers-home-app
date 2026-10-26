@@ -96,6 +96,7 @@ export async function loadFamilyData(supabase: SupabaseClient, userId: string): 
     myTasks: assignments.data.filter((a) => a.user_id === userId).map((a) => ({
       id: a.id,
       taskId: a.task_id,
+      code: a.tasks?.code ?? null,
       name: a.tasks?.name ?? '—',
       xp: a.tasks?.xp ?? 0,
       status: a.status,

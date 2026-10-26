@@ -99,6 +99,8 @@ h1, h2, h3, p { margin: 0; }
 .task-list li:last-child .task { border-bottom: none; }
 .task:active { transform: scale(0.98); }
 .chevron { color: var(--muted); font-size: 24px; line-height: 1; }
+.task-icon { flex: none; border-radius: 14px; border: 2px solid var(--ink); background: #fff; object-fit: cover; }
+.sheet .task-icon { border-radius: 24px; align-self: center; }
 .task-main { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .task-name { font-size: 20px; font-weight: 500; }
 .xp-pill { background: var(--accent-soft); color: var(--accent-dark); font-weight: 500; font-size: 18px; border: 2px solid var(--accent-dark); padding: 6px 12px; border-radius: 99px; white-space: nowrap; }
